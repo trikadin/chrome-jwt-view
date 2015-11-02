@@ -1,0 +1,20 @@
+{
+  "name": "chrome-jwt-view",
+  "version": "0.1.0",
+  "description": "Google Chrome extension to view, parse and validate JSON Web Tokens",
+  "homepage": "https://github.com/trikadin/chrome-jwt-view",
+  "authors": [
+    "Константин <trikadin@mail.ru>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "webcrypto-jwt": "~0.2.1"
+  }
+}

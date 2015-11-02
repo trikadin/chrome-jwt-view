@@ -1,0 +1,28 @@
+{
+  "manifest_version": 2,
+  "name": "chrome-jwt-view",
+  "version": "0.1.0",
+  "description": "Google Chrome extension to view, parse and validate JSON Web Tokens",
+  "permissions": [
+    "tabs",
+    "clipboardWrite",
+    "webRequest",
+    "<all_urls>"
+  ],
+  "background": {
+    "persistent": false,
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.vk.com/*"
+      ],
+      "js": ["content.js"],
+      "css": ["static/css/single.css"]
+    }
+  ],
+  "web_accessible_resources": [
+    "static/img/*.png"
+  ]
+}
