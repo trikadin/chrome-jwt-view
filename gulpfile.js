@@ -144,6 +144,7 @@ gulp.task('build:manifest', ['build:clean'], (() => {
   const src = './manifest.json';
 
   function task(cb) {
+    gutil.log(`[${'build:manifest'.cyan}]: updated`);
     gulp.src(src)
       .pipe(gulp.dest(dist))
       .on('end', typeof cb === 'function' ? cb : () => {});
