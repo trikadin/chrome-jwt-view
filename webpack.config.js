@@ -1,16 +1,17 @@
-const path = require('path');
+const
+  path = require('path'),
+  webpack = require('webpack');
 
 const src = path.join(__dirname, 'src');
 
 module.exports = {
   verbose: true,
 
+  context: src,
+
   entry: {
-    contest: __dirname,
-    entry: {
-      background: path.join(src, 'background.js'),
-      context: path.join(src, 'content.js')
-    }
+    background: './background.js',
+    content: './content.js'
   },
 
   output: {
@@ -19,19 +20,39 @@ module.exports = {
   },
 
   module: {
-    test: /\.js$/,
-    exclude: /bower_components/,
-    loader: 'babel',
-    query: {
-      blacklist: [
-        'regenerator',
-        'es6.blockScoping',
-        'es6.constants',
-        'es6.forOf',
-        'es6.templateLiterals'
-      ]
-    }
+    loaders: [{
+      test: /\.js$/,
+      exclude: /bower_components/,
+      loader: 'babel',
+      query: {
+        stage: 0,
+
+        optional: [
+          'asyncToGenerator',
+          'spec.undefinedToVoid'
+        ],
+
+        blacklist: [
+          'es3.memberExpressionLiterals',
+          'es3.propertyLiterals',
+
+          'es5.properties.mutators',
+
+          'regenerator',
+          'es6.blockScoping',
+          'es6.constants',
+          'es6.forOf',
+          'es6.literals',
+          'es6.properties.computed',
+          'es6.properties.shorthand',
+          'es6.spread',
+          'es6.templateLiterals'
+        ]
+      }
+    }]
   },
+
+  plugins: process.env.NODE_ENV === 'production' ? [new webpack.optimize.UglifyJsPlugin()] : null,
 
   resolve: {
     modulesDirectories: ['bower_components']

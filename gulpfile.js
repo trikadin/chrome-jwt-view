@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 require('colors');
 
@@ -8,6 +8,8 @@ const
   del = require('del'),
   gulp = require('gulp'),
   bump = require('gulp-bump'),
+  gutil = require('gulp-util'),
+  webpack = require('webpack'),
 
   program = require('commander'),
   semver = require('semver');
@@ -46,13 +48,6 @@ program
   )
   .allowUnknownOption();
 
-const bumpConfig = {
-  types: ['major', 'minor', 'patch'],
-  default: 'patch',
-  type: null,
-  value: null
-};
-
 const bumpCommand = program
   .command('bump [type]')
   .description(`Bump version (${'major|minor|patch'.yellow}) [${'patch'.yellow}]`)
@@ -79,28 +74,30 @@ const buildCommand = program
   .command('build')
   .description('Build project, if environment is standalone run watcher')
   .option(
-    '-w, --watcher [boolean]',
-    'exactly enable or disable running of watcher [true|false] (true)',
+    '-w, --watch [status]',
+    'exactly enable or disable running of watcher [on|off] (on)',
     (value) => {
       // Использование без значения принудительно включает вотчер
       if (value === null) {
-        value = 'true';
+        value = 'on';
       }
 
-      if (!/^(true|false)$/.test(value)) {
+      if (!/^(on|off)$/.test(value)) {
         die(`Invalid value for --watcher option: ${value.yellow}`, buildCommand);
       }
 
-      return JSON.parse(value);
+      return value === 'on';
     },
     null
   )
-  .action(() => {});
+  .action(() => {
+    buildCommand.current = true;
+  });
 
 program.parse(process.argv);
 
 process.env.NODE_ENV = program.env;
-log(`Environment mode: ${program.env.yellow}`);
+log(`Environment: ${program.env.yellow}`);
 
 /*---------- TASK BUMP ----------*/
 
@@ -122,7 +119,84 @@ gulp.task(bumpCommand.name(), (ignore) => {
     .pipe(gulp.dest('./'))
     .on('end', () => {
       log(`Done, new version is ${determineVersion().yellow}`);
-    })
+    });
 });
 
 /*---------- TASK BUMP END ----------*/
+
+/*---------- TASK BUILD ----------*/
+
+if (buildCommand.watch === null) {
+  buildCommand.watch = program.env === 'standalone';
+}
+
+if (buildCommand.current) {
+  log(`Watcher: ${(buildCommand.watch ? 'enabled' : 'disabled').yellow}`);
+}
+
+const dist = './dist';
+
+gulp.task('build:clean', () => {
+  return del([dist]);
+});
+
+gulp.task('build:manifest', ['build:clean'], (() => {
+  const src = './manifest.json';
+
+  function task(cb) {
+    gulp.src(src)
+      .pipe(gulp.dest(dist))
+      .on('end', typeof cb === 'function' ? cb : () => {});
+  }
+
+  return (cb) => {
+    task(() => {
+      if (buildCommand.watch) {
+        gulp.watch(src, task);
+      }
+
+      cb();
+    });
+  };
+})());
+
+gulp.task('build:webpack', ['build:clean', 'build:manifest'], (cb) => {
+  const
+    compiler = webpack(require('./webpack.config')),
+    isWatch = buildCommand.watch;
+
+  function listener(err, stats) {
+    if (err) {
+      if (isWatch) {
+        gutil.log(err);
+        gutil.log(err.stack);
+      } else {
+        throw err;
+      }
+    }
+
+    gutil.log(`[${'build:webpack'.cyan}]`, stats.toString({
+      colors: true
+    }));
+
+    if (!isWatch) {
+      cb();
+    }
+  }
+
+  if (isWatch) {
+    compiler.watch({}, listener);
+  } else {
+    compiler.run(listener);
+  }
+});
+
+gulp.task('build:test-page', () => {
+  require('./jwt-test');
+});
+
+gulp.task('build', [
+  'build:clean',
+  'build:manifest',
+  'build:webpack'
+].concat(buildCommand.watch ? 'build:test-page' : []));
