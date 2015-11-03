@@ -7,22 +7,18 @@
     "tabs",
     "clipboardWrite",
     "webRequest",
+    "webRequestBlocking",
     "<all_urls>"
   ],
   "background": {
-    "persistent": false,
     "scripts": ["background.js"]
   },
   "content_scripts": [
     {
       "matches": [
-        "*://*.vk.com/*"
+        "<all_urls>"
       ],
-      "js": ["content.js"],
-      "css": ["static/css/single.css"]
+      "js": ["content.js"]
     }
-  ],
-  "web_accessible_resources": [
-    "static/img/*.png"
   ]
 }
