@@ -1,0 +1,108 @@
+main {
+  width: 90%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+.column {
+  width: 48%;
+  display: flex;
+  flex-direction: column;
+}
+
+.column > h1 {
+  font-size: 28px;
+  font-weight: normal;
+  margin: 0 0 20px;
+}
+
+.column > h1 > small {
+  font-size: 10px;
+  color: #979797;
+  text-transform: uppercase;
+}
+
+.section-body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+#jwt {
+  display: block;
+  flex-grow: 1;
+  width: 100%;
+  font-family: "Courier New", monospace;
+  font-size: 20px;
+  border: 1px solid rgba(155,155,155,0.5);
+  padding: 20px;
+  outline: none;
+  resize: vertical;
+}
+
+.chunk {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  border: solid rgba(155,155,155,0.5);
+  border-width: 1px 1px 0;
+}
+
+.chunk:last-child {
+  border-bottom-width: 1px;
+}
+
+.chunk > h2 {
+  font-size: 12px;
+  padding: 0 10px;
+  margin: 0;
+  border-bottom: 1px solid rgba(155,155,155,0.5);
+  line-height: 30px;
+  font-weight: normal;
+  text-transform: uppercase;
+}
+
+.chunk.error > h2 {
+  background-color: rgba(256,0,0,0.5);
+}
+
+.chunk > h2 > span {
+  color: #979797;
+}
+
+.chunk-body {
+  box-sizing: border-box;
+  flex-grow: 1;
+  font-size: 14px;
+  color: #333;
+  padding: 20px;
+  white-space: pre-wrap;
+}
+
+#header {
+  color: #fb015b;
+}
+
+#payload {
+  color: #d63aff;
+}
+
+#signature {
+  color: #00b9f1;
+}
+
+footer {
+  width: 90%;
+  background: red;
+  margin: 20px auto;
+  color: #fff;
+  font-size: 30px;
+  text-align: center;
+  padding: 10px 0;
+}
+
+footer.ok {
+  background: #00b9f1;
+}

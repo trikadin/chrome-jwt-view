@@ -1,0 +1,49 @@
+<main>
+  <section class="column">
+    <h1>
+      Encoded
+      <small>
+        Paste a token here
+      </small>
+    </h1>
+
+    <div class="section-body">
+      <textarea id="jwt">{{token}}</textarea>
+    </div>
+  </section>
+
+  <section class="column">
+    <h1>
+      Decoded
+    </h1>
+
+    <div class="section-body">
+      <div class="chunk">
+        <h2>Header</h2>
+
+        <div id="header" class="chunk-body" contenteditable></div>
+      </div>
+
+      <div class="chunk">
+        <h2>Payload</h2>
+
+        <div id="payload" class="chunk-body" contenteditable></div>
+      </div>
+
+      <div class="chunk">
+        <h2>Verify signature</h2>
+
+        <div id="signature" class="chunk-body">
+  HMACSHA256(
+    base64UrlEncode(header) + "." +
+    base64UrlEncode(payload),
+    <input type="text" id="secret" value="secret">
+  )
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer>
+
+</footer>

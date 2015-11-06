@@ -1,22 +1,38 @@
 type HTTPHeader = {name: string, value: string};
 
+const
+  editedRequests = {},
+  requestsFilter = {
+    urls: ['http://*/*', 'https://*/*'],
+    types: ['main_frame']
+  };
+
 chrome.webRequest.onHeadersReceived.addListener(
-  ({responseHeaders} :{responseHeaders :Array<HTTPHeader>}) => {
-    console.log('onHeadersReceived', responseHeaders);
-    if (responseHeaders) {
-      const ctHeader :HTTPHeader = responseHeaders.find(({name}) => /^content-type$/i.test(name));
+  ({responseHeaders, requestId, tabId}:
+    {responseHeaders: Array<HTTPHeader>, requestId: string, tabId: string}
+  ) => {
+    if (responseHeaders && tabId !== -1) {
+      const ctHeader: HTTPHeader = responseHeaders.find(({name}) => /^content-type$/i.test(name));
+
       if (ctHeader && ctHeader.value === 'application/jwt') {
-        ctHeader.value = 'text/plain';
-        console.log('UPDATED!');
-        chrome.webRequest.handlerBehaviorChanged();
+        ctHeader.value = 'text/jwt';
+        editedRequests[requestId] = true;
+        return {responseHeaders};
       }
     }
   },
 
-  {
-    urls: ['http://localhost/*'],
-    types: ['main_frame']
+  requestsFilter,
+
+  ['responseHeaders', 'blocking']
+);
+
+chrome.webRequest.onCompleted.addListener(
+  ({requestId, tabId}: {requestId: string, tabId: string}) => {
+    if (editedRequests[requestId]) {
+      chrome.tabs.executeScript(tabId, {file: 'content.js'});
+    }
   },
 
-  ['responseHeaders']
+  requestsFilter
 );
