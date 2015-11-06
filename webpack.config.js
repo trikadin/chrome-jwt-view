@@ -27,6 +27,7 @@ module.exports = {
         loader: 'babel',
         query: {
           stage: 0,
+          retainLines: true,
 
           optional: [
             'asyncToGenerator',

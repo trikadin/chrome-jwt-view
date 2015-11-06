@@ -1,4 +1,9 @@
-import { stringifyChunk, base64, signJWT } from './utils';
+import {
+  stringifyChunk,
+  base64,
+  signJWT,
+  verifyJWT
+} from './utils';
 import template from './editor.hbs';
 
 function parseChunk(str: string) :Object {
@@ -38,13 +43,37 @@ export default function init(initialToken: string = '') {
     secret = document.getElementById('secret'),
     footer = document.querySelector('footer');
 
+  async function updateVerifyBlock() {
+    try {
+      if (await verifyJWT(textarea.value, secret.value)) {
+        footer.classList.add('ok');
+        footer.textContent = 'Signature verified';
+      } else {
+        footer.classList.remove('ok');
+        footer.textContent = 'Invalid signature';
+      }
+    } catch (err) {
+      console.error(err.stack);
+    }
+  }
+
+  secret.addEventListener('input', updateVerifyBlock, false);
+
   function renderParsedJWT() {
     const token = textarea.value.split('.');
     renderChunk(header, token[0]);
     renderChunk(payload, token[1]);
+    updateVerifyBlock();
   }
 
   async function rebuildToken() {
+    try {
+      JSON.parse(this.textContent);
+      this.parentNode.classList.remove('error');
+    } catch (ignore) {
+      this.parentNode.classList.add('error');
+    }
+
     let
       token = '',
       headerObj,
@@ -56,19 +85,20 @@ export default function init(initialToken: string = '') {
 
       token += stringifyChunk(headerObj) + '.' + stringifyChunk(payloadObj) + '.';
     } catch (ignore) {
-      footer.textContent = 'Chunk value is not valid JSON';
+      updateVerifyBlock();
       return;
     }
 
     try {
       token += base64.to(await signJWT(headerObj, payloadObj, secret.value || ''));
     } catch (err) {
+      updateVerifyBlock();
       console.error(err);
-      footer.textContent = err.message;
       throw err;
     }
 
     textarea.value = token;
+    updateVerifyBlock();
   }
 
   textarea.addEventListener('input', renderParsedJWT, false);
