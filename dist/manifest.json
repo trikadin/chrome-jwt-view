@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "chrome-jwt-view",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Google Chrome extension to view, parse and validate JSON Web Tokens",
   "permissions": [
     "tabs",
@@ -11,6 +11,8 @@
     "<all_urls>"
   ],
   "background": {
-    "scripts": ["background.js"]
+    "scripts": [
+      "background.js"
+    ]
   }
 }
